@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="coffee_dark">#3E2723</color>
+    <color name="coffee_brown">#6F4E37</color>
+    <color name="coffee_light">#A67C52</color>
+    <color name="cream">#FBF7F2</color>
+    <color name="foam">#F6E7D4</color>
+    <color name="white">#FFFFFF</color>
+    <color name="ink">#2C211C</color>
+    <color name="muted">#8A7568</color>
+    <color name="ok">#2E7D4F</color>
+    <color name="error">#A33B32</color>
+    <color name="saucer">#E4CDB8</color>
+</resources>

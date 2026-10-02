@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cafetera</string>
+    <string name="tagline">Cuando quieras, preparo uno.</string>
+    <string name="splash_subtitle">Calentando el agua…</string>
+    <string name="make_coffee">Hacer café</string>
+    <string name="sending">Enviando…</string>
+    <string name="status_idle">Tocá el botón para preparar un café.</string>
+    <string name="status_sending">Enviando el pedido…</string>
+    <string name="status_ok">Pedido enviado. El café está en camino.</string>
+    <string name="status_error">No se pudo enviar: %1$s</string>
+    <string name="config_error">No se pudo leer config.properties: %1$s</string>
+    <string name="cup_description">Taza de café</string>
+    <string name="broker_line">Broker: %1$s</string>
+    <string name="topic_line">Tópico: %1$s</string>
+    <string name="payload_line">Mensaje: %1$s</string>
+</resources>
