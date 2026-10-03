@@ -22,6 +22,7 @@
     <string name="notifications_denied">Activa los avisos del sistema para saber cuándo el café está listo.</string>
     <string name="coffee_ready">%1$s</string>
     <string name="coffee_ready_mark">Café listo</string>
+    <string name="coffee_ready_time">Listo a las %1$s</string>
     <string name="cup_note">Nota del pedido</string>
     <string name="cup_wait">Esperando el café</string>
 </resources>

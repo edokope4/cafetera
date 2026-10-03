@@ -106,11 +106,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        CoffeeAlerts.listener = { body ->
+        CoffeeAlerts.listener = { body, readyAt ->
             if (!isDestroyed) {
                 showCup(CupMark.TICKET)
                 binding.status.text = getString(R.string.coffee_ready, body)
                 binding.status.setTextColor(ContextCompat.getColor(this, R.color.ok))
+                showReadyTime(readyAt)
             }
         }
         if (intent.getBooleanExtra(EXTRA_COFFEE_READY, false)) {
@@ -132,6 +133,7 @@ class MainActivity : AppCompatActivity() {
         if (showingReady || intent.getBooleanExtra(EXTRA_COFFEE_READY, false)) {
             intent.removeExtra(EXTRA_COFFEE_READY)
             intent.removeExtra(EXTRA_COFFEE_MESSAGE)
+            intent.removeExtra(EXTRA_COFFEE_READY_AT)
             CoffeeReady.clear(this)
             forgetReadyOnNextStart = true
         }
@@ -141,12 +143,14 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_COFFEE_READY = "coffee_ready"
         const val EXTRA_COFFEE_MESSAGE = "coffee_message"
+        const val EXTRA_COFFEE_READY_AT = "coffee_ready_at"
         private const val OVERLAY_PROMPTED = "overlay_prompted"
     }
 
     private fun showReadyFromIntent(intent: Intent) {
         if (!intent.getBooleanExtra(EXTRA_COFFEE_READY, false)) return
         showCup(CupMark.TICKET)
+        showReadyTime(intent.getStringExtra(EXTRA_COFFEE_READY_AT))
         val message = intent.getStringExtra(EXTRA_COFFEE_MESSAGE)?.takeIf { it.isNotBlank() } ?: return
         binding.status.text = getString(R.string.coffee_ready, message)
         binding.status.setTextColor(ContextCompat.getColor(this, R.color.ok))
@@ -169,12 +173,27 @@ class MainActivity : AppCompatActivity() {
         CoffeeReady.clear(this)
         intent.removeExtra(EXTRA_COFFEE_READY)
         intent.removeExtra(EXTRA_COFFEE_MESSAGE)
+        intent.removeExtra(EXTRA_COFFEE_READY_AT)
+        showReadyTime(null)
         forgetReadyOnNextStart = false
+    }
+
+    private fun showReadyTime(raw: String?) {
+        val label = CoffeeTime.label(raw)
+        if (label == null) {
+            binding.readyTime.visibility = android.view.View.GONE
+            return
+        }
+        binding.readyTime.text = getString(R.string.coffee_ready_time, label)
+        binding.readyTime.visibility = android.view.View.VISIBLE
     }
 
     private fun showCup(mark: CupMark) {
         cup = mark
         CoffeeAlerts.waiting = mark == CupMark.CLOCK
+        if (mark != CupMark.TICKET) {
+            binding.readyTime.visibility = android.view.View.GONE
+        }
         if (mark == CupMark.NONE) {
             binding.readyMark.visibility = android.view.View.GONE
             return

@@ -4,9 +4,10 @@ import android.os.Handler
 import android.os.Looper
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import java.time.Instant
 
 object CoffeeAlerts {
-    var listener: ((String) -> Unit)? = null
+    var listener: ((String, String) -> Unit)? = null
     var waiting: Boolean = false
 }
 
@@ -19,18 +20,19 @@ class CoffeeMessagingService : FirebaseMessagingService() {
             ?: message.data["message"]
             ?: message.data["body"]
             ?: return
+        val readyAt = message.data["ready_at"]?.takeIf { it.isNotBlank() } ?: Instant.now().toString()
         CoffeeReady.mark(this)
         val appContext = applicationContext
         Handler(Looper.getMainLooper()).post {
             val onScreen = CoffeeAlerts.listener != null
             if (onScreen) {
-                CoffeeAlerts.listener?.invoke(body)
+                CoffeeAlerts.listener?.invoke(body, readyAt)
                 CoffeeNotifications.cancel(appContext)
                 Handler(Looper.getMainLooper()).postDelayed({
                     CoffeeNotifications.cancel(appContext)
                 }, 600)
             } else {
-                CoffeeNotifications.show(appContext, title, body)
+                CoffeeNotifications.show(appContext, title, body, readyAt)
             }
         }
     }

@@ -73,6 +73,16 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/readyTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:textColor="@color/ok"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/configSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

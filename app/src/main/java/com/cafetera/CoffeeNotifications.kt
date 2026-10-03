@@ -29,9 +29,9 @@ object CoffeeNotifications {
         manager.createNotificationChannel(channel)
     }
 
-    fun show(context: Context, title: String, body: String) {
+    fun show(context: Context, title: String, body: String, readyAt: String) {
         createChannel(context)
-        val openApp = openIntent(context, body)
+        val openApp = openIntent(context, body, readyAt)
         val pendingIntent = launchPendingIntent(context, openApp)
         if (Build.VERSION.SDK_INT < 33 ||
             ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) ==
@@ -58,13 +58,14 @@ object CoffeeNotifications {
         NotificationManagerCompat.from(context).cancelAll()
     }
 
-    private fun openIntent(context: Context, body: String): Intent {
+    private fun openIntent(context: Context, body: String, readyAt: String): Intent {
         return Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra(MainActivity.EXTRA_COFFEE_READY, true)
             putExtra(MainActivity.EXTRA_COFFEE_MESSAGE, body)
+            putExtra(MainActivity.EXTRA_COFFEE_READY_AT, readyAt)
         }
     }
 
