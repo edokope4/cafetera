@@ -8,15 +8,15 @@ La cafetera son tres proyectos. Este repositorio es la aplicación Android.
 | --- | --- | --- |
 | Cafetera | `C:\develop\cafetera` | App Android. Publica el pedido y muestra el estado en la taza. |
 | Radar MQTT | `C:\develop\radar-mqtt` | Cliente de Windows para escuchar y publicar. Ver `doc/desarrollo.md` de ese proyecto. |
-| cafetera-under-backend | `C:\develop\cafetera-under-backend` | Servicio que, al recibir «Cafe listo», envía el aviso push y publica `turn-off`. |
+| cafetera-under-backend | `C:\develop\cafetera-under-backend` | Servicio que, al recibir «Cafe listo», envía el aviso push. Si el mensaje ya trae `turn-off`, no vuelve a publicarlo. |
 
 Repositorio: https://github.com/edokope4/cafetera
 
 ## Flujo
 
 1. En el teléfono, **Café por favor** publica en `cl/kope/iot/cafetera` el JSON `{"action": "turn-on","pulso_ms": 500}`.
-2. La máquina (u otro publicador) avisa en `cl/kope/iot/cafetera/status` con `{"code": 4, "message": "Cafe listo"}`.
-3. El backend envía un mensaje de datos de FCM al teléfono y republica en `cl/kope/iot/cafetera` el mismo JSON con `"action": "turn-off"`.
+2. La placa parpadea 30 segundos y publica en `cl/kope/iot/cafetera/status` el JSON `{"code": 4, "message": "Cafe listo", "action": "turn-off"}`.
+3. El backend envía un mensaje de datos de FCM al teléfono. Como el aviso ya trae `turn-off`, no lo vuelve a publicar.
 4. Si la app está abierta, la taza pasa al ticket verde y no aparece el banner. Si está cerrada, el aviso abre la app ya con el ticket.
 
 ## Contrato MQTT de la app

@@ -19,8 +19,8 @@ Paquete: `com.cafetera`. minSdk 26, compileSdk y targetSdk 35.
 
 1. **Café por favor** publica en `cl/kope/iot/cafetera`.
 2. La placa recibe ese pedido.
-3. Al terminar, alguien publica en `cl/kope/iot/cafetera/status` que el café está listo.
-4. El backend envía un aviso al teléfono y publica la orden de apagado en `cl/kope/iot/cafetera`.
+3. Al terminar el parpadeo, la placa publica en `cl/kope/iot/cafetera/status` el café listo con `"action": "turn-off"`.
+4. El backend envía un aviso al teléfono y no vuelve a publicar la orden, porque el mensaje ya trae `turn-off`.
 5. Si la app está abierta, la taza pasa al ticket y no aparece el banner. Si está cerrada, el aviso abre la app ya con el ticket.
 
 ## MQTT
@@ -30,8 +30,7 @@ Broker de prueba: `tcp://test.mosquitto.org:1883`. La configuración está en `c
 | Tópico | Mensaje | Quién lo envía |
 | --- | --- | --- |
 | `cl/kope/iot/cafetera` | `{"action": "turn-on","pulso_ms": 500}` | Esta app, con QoS 2 |
-| `cl/kope/iot/cafetera/status` | `{"code": 4, "message": "Cafe listo"}` | La cafetera |
-| `cl/kope/iot/cafetera` | `{"code": 4, "message": "Cafe listo", "action": "turn-off"}` | El backend |
+| `cl/kope/iot/cafetera/status` | `{"code": 4, "message": "Cafe listo", "action": "turn-off"}` | La placa, al terminar el parpadeo |
 
 `mqtt.payload` es texto literal. Java `Properties` no trata las comillas como delimitador: si se escriben, se envían. El primer `=` de la línea separa la clave del valor.
 
