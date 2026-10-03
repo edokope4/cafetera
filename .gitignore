@@ -11,3 +11,5 @@
 *.apk
 *.ap_
 *.aab
+/secrets/
+app/google-services.json

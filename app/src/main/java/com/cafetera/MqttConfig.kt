@@ -12,6 +12,7 @@ data class MqttConfig(
     val clientId: String,
     val username: String,
     val password: String,
+    val debug: Boolean,
 ) {
     companion object {
         fun load(context: Context): MqttConfig {
@@ -47,6 +48,7 @@ data class MqttConfig(
                 clientId = clientId,
                 username = properties.getProperty("mqtt.username")?.trim().orEmpty(),
                 password = properties.getProperty("mqtt.password")?.trim().orEmpty(),
+                debug = properties.getProperty("debug")?.trim().equals("true", ignoreCase = true),
             )
         }
     }

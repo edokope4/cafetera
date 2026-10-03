@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Cafetera</string>
-    <string name="tagline">Cuando quieras, preparo uno.</string>
+    <string name="home_title">Cafecito</string>
     <string name="splash_subtitle">Calentando el agua…</string>
-    <string name="make_coffee">Hacer café</string>
+    <string name="make_coffee">Café por favor</string>
     <string name="sending">Enviando…</string>
     <string name="status_idle">Tocá el botón para preparar un café.</string>
     <string name="status_sending">Enviando el pedido…</string>
@@ -14,4 +14,14 @@
     <string name="broker_line">Broker: %1$s</string>
     <string name="topic_line">Tópico: %1$s</string>
     <string name="payload_line">Mensaje: %1$s</string>
+    <string name="notification_channel_name">Avisos de la cafetera</string>
+    <string name="notification_channel_description">Avisa cuando el café está listo.</string>
+    <string name="push_not_configured">Los avisos push se activan al agregar google-services.json.</string>
+    <string name="push_token_line">Token de avisos:\n%1$s</string>
+    <string name="push_token_error">No se pudo obtener el token de avisos.</string>
+    <string name="notifications_denied">Activa los avisos del sistema para saber cuándo el café está listo.</string>
+    <string name="coffee_ready">%1$s</string>
+    <string name="coffee_ready_mark">Café listo</string>
+    <string name="cup_note">Nota del pedido</string>
+    <string name="cup_wait">Esperando el café</string>
 </resources>
