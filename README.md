@@ -31,6 +31,7 @@ Broker de prueba: `tcp://test.mosquitto.org:1883`. La configuración está en `c
 | --- | --- | --- |
 | `cl/kope/iot/cafetera` | `{"action": "turn-on","pulso_ms": 500}` | Esta app, con QoS 2 |
 | `cl/kope/iot/cafetera/status` | `{"code": 4, "message": "Cafe listo", "action": "turn-off"}` | La placa, al terminar el parpadeo |
+| `cl/kope/iot/cafetera/alive` | `{"status": "alive", "device": "cafetera", "uptime_s": 60}` | La placa, cada 60 segundos |
 
 `mqtt.payload` es texto literal. Java `Properties` no trata las comillas como delimitador: si se escriben, se envían. El primer `=` de la línea separa la clave del valor.
 
