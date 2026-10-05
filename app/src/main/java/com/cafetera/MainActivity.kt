@@ -3,10 +3,8 @@ package com.cafetera
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -42,7 +40,6 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             CoffeeReady.clear(this)
-            ensureCanOpenWhenClosed()
         }
         CoffeeNotifications.createChannel(this)
         try {
@@ -144,7 +141,6 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_COFFEE_READY = "coffee_ready"
         const val EXTRA_COFFEE_MESSAGE = "coffee_message"
         const val EXTRA_COFFEE_READY_AT = "coffee_ready_at"
-        private const val OVERLAY_PROMPTED = "overlay_prompted"
     }
 
     private fun showReadyFromIntent(intent: Intent) {
@@ -154,19 +150,6 @@ class MainActivity : AppCompatActivity() {
         val message = intent.getStringExtra(EXTRA_COFFEE_MESSAGE)?.takeIf { it.isNotBlank() } ?: return
         binding.status.text = getString(R.string.coffee_ready, message)
         binding.status.setTextColor(ContextCompat.getColor(this, R.color.ok))
-    }
-
-    private fun ensureCanOpenWhenClosed() {
-        if (Settings.canDrawOverlays(this)) return
-        val prefs = getSharedPreferences("cafetera", MODE_PRIVATE)
-        if (prefs.getBoolean(OVERLAY_PROMPTED, false)) return
-        prefs.edit().putBoolean(OVERLAY_PROMPTED, true).apply()
-        startActivity(
-            Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName"),
-            ),
-        )
     }
 
     private fun clearReadyRequest() {
@@ -217,11 +200,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun preparePush() {
-        if (config?.debug != true) return
-        binding.pushToken.visibility = android.view.View.VISIBLE
-        if (FirebaseApp.getApps(this).isEmpty()) {
-            binding.pushToken.text = getString(R.string.push_not_configured)
-            return
+        if (config?.debug == true) {
+            binding.pushToken.visibility = android.view.View.VISIBLE
+            if (FirebaseApp.getApps(this).isEmpty()) {
+                binding.pushToken.text = getString(R.string.push_not_configured)
+            }
         }
         val needsPermission = Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=

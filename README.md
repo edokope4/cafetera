@@ -21,11 +21,11 @@ Paquete: `com.cafetera`. minSdk 26, compileSdk y targetSdk 35.
 2. La placa recibe ese pedido.
 3. Al terminar el parpadeo, la placa publica en `cl/kope/iot/cafetera/status` el café listo con `"action": "turn-off"`.
 4. El backend envía un aviso al teléfono y no vuelve a publicar la orden, porque el mensaje ya trae `turn-off`.
-5. Si la app está abierta, la taza pasa al ticket y no aparece el banner. Si está cerrada, el aviso abre la app ya con el ticket.
+5. Si la app está abierta, la taza pasa al ticket y no aparece el banner. Si está cerrada, el aviso queda en la barra de notificaciones. La app se abre al tocarlo.
 
 ## MQTT
 
-Broker de prueba: `tcp://test.mosquitto.org:1883`. La configuración está en `config.properties` y se copia dentro del APK en cada compilación. Cambiar ese archivo no actualiza la app ya instalada: hay que volver a compilar e instalar.
+Broker de prueba: `tcp://broker.hivemq.com:1883`. La configuración está en `config.properties` y se copia dentro del APK en cada compilación. Cambiar ese archivo no actualiza la app ya instalada: hay que volver a compilar e instalar.
 
 | Tópico | Mensaje | Quién lo envía |
 | --- | --- | --- |
@@ -53,7 +53,7 @@ La hora llega en el dato `ready_at` del aviso, en UTC, y se muestra en la zona d
 
 Pulsar el botón otra vez quita la marca. Cerrar la app y volver a abrirla también. El ticket solo aparece cuando llega el aviso, o al abrir la app desde ese aviso.
 
-Con la app en primer plano no se muestra el banner del sistema. Con la app cerrada, en Android reciente hace falta el permiso de mostrar sobre otras aplicaciones para abrirla sola. Sin ese permiso, tocar el aviso igual abre la taza con el ticket.
+Con la app en primer plano no se muestra el banner del sistema. Con la app cerrada, el aviso queda en la barra. La app no se abre sola: hay que tocar la notificación para ver la taza con el ticket.
 
 ## Compilar
 

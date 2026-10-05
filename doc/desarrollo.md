@@ -17,14 +17,14 @@ Repositorio: https://github.com/edokope4/cafetera
 1. En el teléfono, **Café por favor** publica en `cl/kope/iot/cafetera` el JSON `{"action": "turn-on","pulso_ms": 500}`.
 2. La placa parpadea 30 segundos y publica en `cl/kope/iot/cafetera/status` el JSON `{"code": 4, "message": "Cafe listo", "action": "turn-off"}`.
 3. El backend envía un mensaje de datos de FCM al teléfono. Como el aviso ya trae `turn-off`, no lo vuelve a publicar.
-4. Si la app está abierta, la taza pasa al ticket verde y no aparece el banner. Si está cerrada, el aviso abre la app ya con el ticket.
+4. Si la app está abierta, la taza pasa al ticket verde y no aparece el banner. Si está cerrada, el aviso queda en la barra de notificaciones. La app se abre al tocarlo.
 
 ## Contrato MQTT de la app
 
 Definido en `config.properties`, en la raíz:
 
 ```properties
-mqtt.broker=tcp://test.mosquitto.org:1883
+mqtt.broker=tcp://broker.hivemq.com:1883
 mqtt.topic=cl/kope/iot/cafetera
 mqtt.payload={"action": "turn-on","pulso_ms": 500}
 mqtt.qos=2
@@ -87,8 +87,7 @@ Iconos: `ic_coffee.xml`, `ic_cup_note.xml`, `ic_cup_clock.xml`, `ic_ready_check.
 El backend manda un mensaje de datos de FCM, prioridad alta, sin bloque `notification`. Así `CoffeeMessagingService.onMessageReceived` siempre corre.
 
 - Con la actividad iniciada, la taza pasa al ticket, se muestra la hora del aviso y se cancelan las notificaciones de la app. No se muestra el banner. La hora llega en el dato `ready_at` del backend y se presenta en la zona horaria del teléfono. Si ese dato no viene, se usa la hora en que el teléfono recibió el aviso.
-- Con la app cerrada, se muestra el aviso. Al tocarlo, o si el sistema deja traer la actividad al frente, `MainActivity` abre con el ticket.
-- En Android 16 una app normal no puede abrirse sola en segundo plano. Hace falta el permiso «mostrar sobre otras aplicaciones» (`SYSTEM_ALERT_WINDOW`). En el teléfono de prueba se concedió con `adb shell appops set com.cafetera SYSTEM_ALERT_WINDOW allow`. Si falta, la app lo pide una sola vez. Sin ese permiso, el aviso sigue abriendo la taza con el ticket al tocarlo.
+- Con la app cerrada, el aviso queda en la barra de notificaciones. No se abre la actividad. Al tocar el aviso, `MainActivity` abre con el ticket.
 - No usar `adb shell am force-stop com.cafetera` para probar avisos: el sistema deja de entregar FCM hasta que alguien abre la app. Para cerrarla en una prueba, ir a inicio y usar `adb shell am kill com.cafetera`.
 
 Código relevante:
@@ -123,6 +122,6 @@ El lanzador es `SplashActivity`. Arrancar `MainActivity` con adb falla porque no
 ## Pendiente
 
 - No hay una variante de release firmada. Solo la versión de depuración, instalada con `installDebug`.
-- El broker sigue siendo el público `test.mosquitto.org`. El usuario y la contraseña están vacíos.
+- El broker de prueba es el público `broker.hivemq.com`, puerto 1883. El usuario y la contraseña están vacíos.
 - El identificador de cliente configurado es solo un prefijo. El identificador real de cada conexión lleva un sufijo.
 - El texto de reposo de la pantalla todavía usa voseo («Tocá el botón…»).

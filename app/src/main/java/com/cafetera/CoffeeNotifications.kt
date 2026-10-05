@@ -1,6 +1,5 @@
 package com.cafetera
 
-import android.app.ActivityOptions
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -16,7 +15,6 @@ object CoffeeNotifications {
     const val CHANNEL_ID = "cafetera_status"
     private const val NOTIFICATION_ID = 41
     private const val OPEN_REQUEST_CODE = 41
-    private const val MODE_ALLOW_ALWAYS = 3
 
     fun createChannel(context: Context) {
         val manager = context.getSystemService(NotificationManager::class.java)
@@ -44,14 +42,12 @@ object CoffeeNotifications {
                 .setContentText(body)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                 .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setContentIntent(pendingIntent)
-                .setFullScreenIntent(pendingIntent, true)
                 .build()
             NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
         }
-        openNow(context, pendingIntent, openApp)
     }
 
     fun cancel(context: Context) {
@@ -70,43 +66,11 @@ object CoffeeNotifications {
     }
 
     private fun launchPendingIntent(context: Context, openApp: Intent): PendingIntent {
-        PendingIntent.getActivity(
+        return PendingIntent.getActivity(
             context,
-            0,
+            OPEN_REQUEST_CODE,
             openApp,
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
-        )?.cancel()
-        val flags = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        if (Build.VERSION.SDK_INT < 34) {
-            return PendingIntent.getActivity(context, OPEN_REQUEST_CODE, openApp, flags)
-        }
-        val options = ActivityOptions.makeBasic()
-        options.pendingIntentCreatorBackgroundActivityStartMode = backgroundStartMode()
-        return PendingIntent.getActivity(context, OPEN_REQUEST_CODE, openApp, flags, options.toBundle())
-    }
-
-    private fun backgroundStartMode(): Int {
-        return if (Build.VERSION.SDK_INT >= 36) {
-            MODE_ALLOW_ALWAYS
-        } else {
-            ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
-        }
-    }
-
-    private fun openNow(context: Context, pendingIntent: PendingIntent, openApp: Intent) {
-        try {
-            if (Build.VERSION.SDK_INT >= 34) {
-                val options = ActivityOptions.makeBasic()
-                options.pendingIntentBackgroundActivityStartMode = backgroundStartMode()
-                pendingIntent.send(context, 0, null, null, null, null, options.toBundle())
-            } else {
-                context.startActivity(openApp)
-            }
-        } catch (_: Exception) {
-            try {
-                context.startActivity(openApp)
-            } catch (_: Exception) {
-            }
-        }
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 }

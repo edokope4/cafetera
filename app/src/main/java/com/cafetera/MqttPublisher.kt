@@ -6,6 +6,9 @@ import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import java.io.IOException
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.URI
 
 object MqttPublisher {
     private const val MAX_ATTEMPTS = 3
@@ -26,22 +29,32 @@ object MqttPublisher {
                     lastError = error
                     closeQuietly(client)
                     if (attempt == MAX_ATTEMPTS || !isRetryable(error)) {
-                        val detail = error.message?.takeIf { it.isNotBlank() } ?: error.javaClass.simpleName
-                        callback(false, detail)
+                        callback(false, errorDetail(error))
                         return@Thread
                     }
                     Thread.sleep(700L * attempt)
                 }
             }
-            val detail = lastError?.message?.takeIf { it.isNotBlank() } ?: "Error al publicar"
-            callback(false, detail)
+            callback(false, lastError?.let(::errorDetail) ?: "Error al publicar")
         }.start()
     }
 
     private fun connect(config: MqttConfig): MqttClient {
+        var lastError: Exception? = null
+        for (broker in brokerCandidates(config.broker)) {
+            try {
+                return open(broker, config)
+            } catch (error: Exception) {
+                lastError = error
+            }
+        }
+        throw lastError ?: IOException("No se pudo resolver el broker")
+    }
+
+    private fun open(broker: String, config: MqttConfig): MqttClient {
         val suffix = java.lang.Long.toHexString(System.nanoTime())
         val clientId = "${config.clientId}-$suffix"
-        val client = MqttClient(config.broker, clientId, MemoryPersistence())
+        val client = MqttClient(broker, clientId, MemoryPersistence())
         client.timeToWait = 10_000
         val options = MqttConnectOptions().apply {
             isCleanSession = true
@@ -56,6 +69,37 @@ object MqttPublisher {
         }
         client.connect(options)
         return client
+    }
+
+    private fun brokerCandidates(broker: String): List<String> {
+        val uri = try {
+            URI(broker)
+        } catch (_: Exception) {
+            return listOf(broker)
+        }
+        val host = uri.host ?: return listOf(broker)
+        val scheme = uri.scheme ?: return listOf(broker)
+        val port = if (uri.port > 0) uri.port else if (scheme == "ssl" || scheme == "wss") 8883 else 1883
+        val addresses = try {
+            InetAddress.getAllByName(host).sortedBy { address -> if (address is Inet4Address) 0 else 1 }
+        } catch (_: Exception) {
+            return listOf(broker)
+        }
+        if (addresses.isEmpty()) return listOf(broker)
+        return addresses.map { address ->
+            val literal = if (address.hostAddress?.contains(':') == true) {
+                "[${address.hostAddress}]"
+            } else {
+                address.hostAddress
+            }
+            "$scheme://$literal:$port"
+        }
+    }
+
+    private fun errorDetail(error: Exception): String {
+        val message = error.message?.takeIf { it.isNotBlank() } ?: error.javaClass.simpleName
+        val cause = error.cause?.message?.takeIf { it.isNotBlank() && it != message }
+        return if (cause == null) message else "$message ($cause)"
     }
 
     private fun deliver(client: MqttClient, config: MqttConfig) {
